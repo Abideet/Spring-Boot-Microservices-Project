@@ -1,88 +1,61 @@
 package com.project.api;
 
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import com.project.domain.Customer;
+import com.project.repository.CustomersRepository;
 
-
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api")
-public class CustomersAPI 
-{
-  private List<Customer> customers;
+public class CustomersAPI {
 
-  public CustomersAPI() 
-  {
-      customers = new ArrayList<>();
-      customers.add(new Customer(1, "abideet", "pass", "abideet@mail.com"));
-      customers.add(new Customer(2, "tom", "pass", "tom@mail.com"));
-      customers.add(new Customer(3, "harry", "pass", "harry@mail.com"));
-  }
+    @Autowired
+    CustomersRepository repo;
 
-  @GetMapping("/customers")
-  public String getCustomers() 
-  {
-      StringBuilder jsonBuilder = new StringBuilder();
-      jsonBuilder.append("[");
-      
-      for (int i = 0; i < customers.size(); i++) {
-          appendCustomerJson(jsonBuilder, customers.get(i));
-          if (i < customers.size() - 1) {
-              jsonBuilder.append(",");
-          }
-      }
-      
-      jsonBuilder.append("]");
-      return jsonBuilder.toString();
-  }
+    public CustomersAPI() {
 
-  @GetMapping("/customers/{id}")
-  public String getCustomerById(@PathVariable int id) 
-  {
-      Optional<Customer> customer = customers.stream()
-                                             .filter(c -> c.getId() == id)
-                                             .findFirst();
-      
-      if (customer.isPresent()) 
-      {
-          StringBuilder jsonBuilder = new StringBuilder();
-          appendCustomerJson(jsonBuilder, customer.get());
-          return jsonBuilder.toString();
-      } else {
-          return "{\"error\": \"Invalid Customer\"}";
-      }
-  }
+    }
 
-  private void appendCustomerJson(StringBuilder jsonBuilder, Customer customer) 
-  {
-      jsonBuilder.append("{");
-      jsonBuilder.append("\"id\":").append(customer.getId()).append(",");
-      jsonBuilder.append("\"username\":\"").append(escapeJson(customer.getName())).append("\",");
-      jsonBuilder.append("\"password\":\"").append(escapeJson(customer.getPassword())).append("\",");
-      jsonBuilder.append("\"email\":\"").append(escapeJson(customer.getEmail())).append("\"");
-      jsonBuilder.append("}");
-  }
+    @GetMapping("/customers")
+    public Iterable<Customer> getAll() {
+        // Iterable<Customer> customers = repo.findAll();
+        return repo.findAll();
+    }
 
-  private String escapeJson(String input) {
-      if (input == null) {
-          return "";
-      }
-      return input.replace("\\", "\\\\")
-                  .replace("\"", "\\\"")
-                  .replace("\b", "\\b")
-                  .replace("\f", "\\f")
-                  .replace("\n", "\\n")
-                  .replace("\r", "\\r")
-                  .replace("\t", "\\t");
-  }
+    @GetMapping("/customers/{id}")
+    public Optional<Customer> getCustomer(@PathVariable long id) {
+        return repo.findById(id);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> addCustomer(@RequestBody Customer newCustomer) {
+        if (newCustomer.getName() == null || newCustomer.getEmail() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        newCustomer = repo.save(newCustomer);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(newCustomer.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).build();
+    }
 }
-

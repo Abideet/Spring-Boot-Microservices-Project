@@ -1,26 +1,41 @@
 package com.project;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
+import java.net.URI;
 import com.project.api.CustomersAPI;
+import com.project.domain.Customer;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+public class CustomerTests {
 
-
-@SpringBootTest
-public class CustomerTests 
-{
+    @Autowired
+    TestRestTemplate template;
 
     @Test
-    public void testCustomerID() 
-    {
-        var api = new CustomersAPI();
-        String result = api.getCustomerById(1);
+    public void testPost() {
+        Customer customer = new Customer();
+        customer.setName("Test");
 
-        assertNotNull(result);
-        assertTrue(result.contains("1"));
+        customer.setEmail("test@test.com");
+
+        URI location = template.postForLocation("/customers", customer, Customer.class);
+        assertNotNull(location);
+
+        customer = template.getForObject(location, Customer.class);
+
+        assertNotNull(customer);
+        assertNotNull(customer.getId());
+        assertEquals("Test", customer.getEmail());
+        assertEquals("test@test.com", customer.getEmail());
     }
-    
+
 }
