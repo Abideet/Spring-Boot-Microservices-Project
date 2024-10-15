@@ -14,15 +14,17 @@ import com.project.repository.CustomersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/customers")
 public class CustomersAPI {
 
     @Autowired
@@ -32,13 +34,13 @@ public class CustomersAPI {
 
     }
 
-    @GetMapping("/customers")
+    @GetMapping
     public Iterable<Customer> getAll() {
         // Iterable<Customer> customers = repo.findAll();
         return repo.findAll();
     }
 
-    @GetMapping("/customers/{id}")
+    @GetMapping("/{id}")
     public Optional<Customer> getCustomer(@PathVariable long id) {
         return repo.findById(id);
     }
@@ -57,5 +59,20 @@ public class CustomersAPI {
                 .toUri();
 
         return ResponseEntity.created(location).build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> putCustomer(@RequestBody Customer customer, @PathVariable long id) {
+        if (customer.getId() != id || customer.getName() == null || customer.getEmail() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        repo.save(customer);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteCustomer(@PathVariable long id) {
+        repo.deleteById(id);
     }
 }

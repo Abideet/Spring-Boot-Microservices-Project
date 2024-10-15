@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 public class Customer {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	long id;
 
 	@Column(name = "name")
