@@ -2,16 +2,20 @@ package com.project.api;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import java.util.Iterator;
+
 import com.project.domain.Customer;
 import com.project.repository.CustomersRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -69,6 +73,36 @@ public class CustomersAPI {
 
         repo.save(customer);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/byname/{username}")
+    public ResponseEntity<?> lookupCustomerByNameGet(@PathVariable("username") String username,
+            UriComponentsBuilder uri) {
+
+        Iterator<Customer> customers = repo.findAll().iterator();
+        while (customers.hasNext()) {
+            Customer cust = customers.next();
+            if (cust.getName().equalsIgnoreCase(username)) {
+                ResponseEntity<?> response = ResponseEntity.ok(cust);
+                return response;
+            }
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    // lookupCustomerByName POST
+    @PostMapping("/byname")
+    public ResponseEntity<?> lookupCustomerByNamePost(@RequestBody String username, UriComponentsBuilder uri) {
+
+        Iterator<Customer> customers = repo.findAll().iterator();
+        while (customers.hasNext()) {
+            Customer cust = customers.next();
+            if (cust.getName().equals(username)) {
+                ResponseEntity<?> response = ResponseEntity.ok(cust);
+                return response;
+            }
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     @DeleteMapping("/{id}")
