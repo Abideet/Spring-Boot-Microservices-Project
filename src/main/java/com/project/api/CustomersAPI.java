@@ -5,8 +5,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import java.util.Iterator;
@@ -90,7 +88,6 @@ public class CustomersAPI {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
-    // lookupCustomerByName POST
     @PostMapping("/byname")
     public ResponseEntity<?> lookupCustomerByNamePost(@RequestBody String username, UriComponentsBuilder uri) {
 

@@ -1,4 +1,4 @@
-package com.project.resources;
+package com.project.domain;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.json.JSONObject;
@@ -17,8 +17,8 @@ class CustomerBuilderTest {
         // Setup a Customer object for testing
         customer = new Customer();
         customer.setId(1);
-        customer.setName("John Doe");
-        customer.setEmail("john.doe@example.com");
+        customer.setName("Abideet");
+        customer.setEmail("Abideet@mail.com");
         customer.setPassword("password123");
     }
 
@@ -27,8 +27,8 @@ class CustomerBuilderTest {
         // Arrange
         String jsonString = new JSONObject()
                 .put("identifier", 1) // Use 'identifier' instead of 'id' if expected
-                .put("fullName", "John Doe")
-                .put("emailAddress", "john.doe@example.com")
+                .put("fullName", "Abideet")
+                .put("emailAddress", "Abideet@mail.com")
                 .put("secretKey", "password123")
                 .toString();
 
@@ -38,8 +38,8 @@ class CustomerBuilderTest {
         // Assert
         assertNotNull(result);
         assertEquals(1, result.getId());
-        assertEquals("John Doe", result.getName());
-        assertEquals("john.doe@example.com", result.getEmail());
+        assertEquals("Abideet", result.getName());
+        assertEquals("Abideet@mail.com", result.getEmail());
         assertEquals("password123", result.getPassword());
     }
 
@@ -52,8 +52,8 @@ class CustomerBuilderTest {
         assertNotNull(jsonString);
         JSONObject jsonObject = new JSONObject(jsonString);
         assertEquals(1, jsonObject.getInt("id"));
-        assertEquals("John Doe", jsonObject.getString("name"));
-        assertEquals("john.doe@example.com", jsonObject.getString("email"));
+        assertEquals("Abideet", jsonObject.getString("name"));
+        assertEquals("Abideet@mail.com", jsonObject.getString("email"));
         assertEquals("password123", jsonObject.getString("password"));
     }
 
